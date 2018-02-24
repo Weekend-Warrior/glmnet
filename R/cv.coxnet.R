@@ -24,6 +24,7 @@ function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
 ###We dont want to extrapolate lambdas on the small side
   mlami=max(sapply(outlist,function(obj)min(obj$lambda)))
   which_lam=lambda >= mlami
+  if (keep) predmat = matrix(NA, nrow(y), length(lambda))
  
     for (i in seq(nfolds)) {
         which = foldid == i
@@ -43,6 +44,11 @@ function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
                 beta = coefmat)
             cvraw[i, seq(along = plk)] = plk
         }
+        if (keep) {
+          preds = predict(fitobj, x[which, , drop = FALSE], s=lambda[which_lam], newoffset = offset[which])
+          nlami = sum(which_lam)
+          predmat[which, seq(nlami)] = preds
+        }
     }
     status = y[, "status"]
     N = nfolds - apply(is.na(cvraw), 2, sum)
@@ -53,6 +59,6 @@ function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
         w = weights, na.rm = TRUE)/(N - 1))
     out = list(cvm = cvm, cvsd = cvsd, name = typenames[type.measure])
     if (keep) 
-        warning("keep=TRUE not implemented for coxnet")
+      out$fit.preval = predmat
     out
 }
