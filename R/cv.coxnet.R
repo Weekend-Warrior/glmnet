@@ -49,7 +49,7 @@ function (outlist, lambda, x, y, weights, offset, foldid, type.measure,
         if(type.measure == 'auc'){
           good[i, seq(nlami)] = 1
           for (j in seq(nlami)) {
-            cvraw[i, j] = auc(y[which, 'status'], -predmat[which, j], weights[which])
+            cvraw[i, j] = auc(y[which, 'status'], predmat[which, j], weights[which])
           }
         }
         else if (grouped) {
